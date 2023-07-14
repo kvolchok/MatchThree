@@ -14,6 +14,8 @@ public class ItemView : MonoBehaviour
     [SerializeField]
     private float _movementDuration;
 
+    private Tweener _tweener;
+
     public void Initialize(ItemModel model)
     {
         Id = model.Id;
@@ -22,13 +24,17 @@ public class ItemView : MonoBehaviour
         transform.DOScale(_endScale, _scaleDuration);
     }
 
-    public void ChangePosition(Vector3 toPosition)
+    public Tweener ChangePosition(Vector3 toPosition)
     {
-        transform.DOMove(toPosition, _movementDuration);
+        _tweener = transform.DOMove(toPosition, _movementDuration);
+        
+        return _tweener;
     }
     
-    public void ChangePosition(Vector3[] path)
+    public Tweener ChangePosition(Vector3[] path)
     {
-        transform.DOPath(path, _movementDuration);
+        _tweener = transform.DOPath(path, _movementDuration);
+        
+        return _tweener;
     }
 }

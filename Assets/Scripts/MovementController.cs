@@ -1,7 +1,10 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
+    private readonly TweenersAwaiter _tweenersAwaiter = new();
+    
     private MatchThreeController _matchThreeController;
     private MapIndexProvider _mapIndexProvider;
     private ItemView[,] _items;
@@ -11,6 +14,8 @@ public class MovementController : MonoBehaviour
     private Vector3 _movementDirection;
     private Vector2Int _currentItemIndex;
     private Vector2Int _targetItemIndex;
+
+    private bool _isMoving;
 
     public void Initialize(MatchThreeController matchThreeController, MapIndexProvider mapIndexProvider, ItemView[,] items)
     {
@@ -22,6 +27,11 @@ public class MovementController : MonoBehaviour
 
     private void Update()
     {
+        if (_isMoving)
+        {
+            return;
+        }
+        
         if (Input.GetMouseButtonDown(0))
         {
             _currentItemPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
@@ -55,18 +65,25 @@ public class MovementController : MonoBehaviour
         var currentItem = _items[_currentItemIndex.x, _currentItemIndex.y];
         var targetItem = _items[_targetItemIndex.x, _targetItemIndex.y];
 
+        _isMoving = true;
+        
         if (!_matchThreeController.IsMatchThreeByIndex(_currentItemIndex) &&
             !_matchThreeController.IsMatchThreeByIndex(_targetItemIndex))
         {
             SwapPlaces(_currentItemIndex, _targetItemIndex);
-            ShowDoubleSwapAnimation(currentItem, targetItem);
+            ShowDoubleSwapAnimation(currentItem, targetItem, OnStopMoving);
         }
         else
         {
-            ShowSwapAnimation(currentItem, targetItem);
+            ShowSwapAnimation(currentItem, targetItem, OnStopMoving);
         }
     }
 
+    private void OnStopMoving()
+    {
+        _isMoving = false;
+    }
+    
     private bool IsAllowedDirection(Vector3 direction, Vector2Int index)
     {
         if (Mathf.Abs(direction.x) - Mathf.Abs(direction.y) == 0)
@@ -89,21 +106,25 @@ public class MovementController : MonoBehaviour
             (_items[targetIndex.x, targetIndex.y], _items[currentIndex.x, currentIndex.y]);
     }
     
-    private void ShowDoubleSwapAnimation(ItemView currentItem, ItemView targetItem)
+    private void ShowDoubleSwapAnimation(ItemView currentItem, ItemView targetItem, TweenCallback onMovementCompleted)
     { 
         var path = new Vector3[2];
         path[0] = targetItem.transform.position;
         path[1] = currentItem.transform.position;
-        currentItem.ChangePosition(path);
-        
+        var currentItemTweener = currentItem.ChangePosition(path);
+
         path[0] = currentItem.transform.position;
         path[1] = targetItem.transform.position;
-        targetItem.ChangePosition(path);
+        var targetItemTweener = targetItem.ChangePosition(path);
+        
+        _tweenersAwaiter.Await(onMovementCompleted, currentItemTweener, targetItemTweener);
     }
 
-    private void ShowSwapAnimation(ItemView currentItem, ItemView targetItem)
+    private void ShowSwapAnimation(ItemView currentItem, ItemView targetItem, TweenCallback onMovementCompleted)
     {
-        currentItem.ChangePosition(targetItem.transform.position);
-        targetItem.ChangePosition(currentItem.transform.position);
+        var currentItemTweener = currentItem.ChangePosition(targetItem.transform.position);
+        var targetItemTweener = targetItem.ChangePosition(currentItem.transform.position);
+        
+        _tweenersAwaiter.Await(onMovementCompleted, currentItemTweener, targetItemTweener);
     }
 }
