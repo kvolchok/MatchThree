@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ItemView : MonoBehaviour
 {
-    public ItemType Type { get; private set; }
+    public int Id { get; private set; }
     [SerializeField]
     private SpriteRenderer _spriteRenderer;
 
@@ -16,7 +16,7 @@ public class ItemView : MonoBehaviour
 
     public void Initialize(ItemModel model)
     {
-        Type = model.Type;
+        Id = model.Id;
         _spriteRenderer.sprite = model.Icon;
 
         transform.DOScale(_endScale, _scaleDuration);

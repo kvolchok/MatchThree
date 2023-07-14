@@ -18,6 +18,8 @@ public class ItemController : MonoBehaviour
 
     public void Initialize(TileMap tileMap)
     {
+        _itemSettings.AssignIdToModels();
+        
         var map = tileMap.GetMap();
         _items = new ItemView[tileMap.Size.x, tileMap.Size.y];
         _matchThreeController.Initialize(_items);

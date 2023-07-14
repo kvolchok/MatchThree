@@ -8,6 +8,15 @@ public class ItemSettings
     [SerializeField]
     private ItemModel[] _itemModels;
 
+    public void AssignIdToModels()
+    {
+        for (var i = 0; i < _itemModels.Length; i++)
+        {
+            var itemModel = _itemModels[i];
+            itemModel.SetId(i);
+        }
+    }
+    
     public ItemModel GetRandomModel()
     {
         var randomIndex = Random.Range(0, _itemModels.Length);
@@ -19,7 +28,7 @@ public class ItemSettings
         while (true)
         {
             var randomIndex = Random.Range(0, _itemModels.Length);
-            if (_itemModels[randomIndex].Type != model.Type)
+            if (_itemModels[randomIndex].Id != model.Id)
             {
                 return _itemModels[randomIndex];
             }
