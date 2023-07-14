@@ -10,17 +10,12 @@ public class ItemController : MonoBehaviour
     [SerializeField]
     private ItemView _itemPrefab;
     
-    [SerializeField]
     private MatchThreeController _matchThreeController;
-    [SerializeField]
-    private MapIndexProvider _mapIndexProvider;
-    [SerializeField]
-    private MovementController _movementController;
-
     private ItemView[,] _items;
 
-    public void Initialize(TileMap tileMap)
+    public void Initialize(TileMap tileMap, MatchThreeController matchThreeController)
     {
+        _matchThreeController = matchThreeController;
         _itemSettings.AssignIdToModels();
         
         var map = tileMap.GetMap();
@@ -39,9 +34,11 @@ public class ItemController : MonoBehaviour
                 ShowItem(item, x, y, _exceptions);
             }   
         }
-        
-        _mapIndexProvider.Initialize(tileMap);
-        _movementController.Initialize(_matchThreeController, _mapIndexProvider, _items);
+    }
+    
+    public ItemView[,] GetItems()
+    {
+        return _items;
     }
 
     private void ShowItem(ItemView item, int row, int column, List<ItemModel> exceptions)
