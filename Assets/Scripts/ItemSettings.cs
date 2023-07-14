@@ -1,37 +1,35 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 [Serializable]
 public class ItemSettings
 {
     [SerializeField]
-    private ItemModel[] _itemModels;
+    private List<ItemModel> _itemModels;
+    
+    private List<ItemModel> _tempList = new();
 
     public void AssignIdToModels()
     {
-        for (var i = 0; i < _itemModels.Length; i++)
+        for (var i = 0; i < _itemModels.Count; i++)
         {
             var itemModel = _itemModels[i];
             itemModel.SetId(i);
         }
     }
-    
-    public ItemModel GetRandomModel()
+
+    public List<ItemModel> GetModelsExcept(List<ItemModel> exceptions)
     {
-        var randomIndex = Random.Range(0, _itemModels.Length);
-        return _itemModels[randomIndex];
-    }
-    
-    public ItemModel GetRandomModelExcept(ItemModel model)
-    {
-        while (true)
+        if (exceptions == null)
         {
-            var randomIndex = Random.Range(0, _itemModels.Length);
-            if (_itemModels[randomIndex].Id != model.Id)
-            {
-                return _itemModels[randomIndex];
-            }
+            return _itemModels;
         }
+        
+        _tempList.Clear();
+        _tempList.AddRange(_itemModels.Where(itemModel => !exceptions.Contains(itemModel)));
+
+        return _tempList;
     }
 }

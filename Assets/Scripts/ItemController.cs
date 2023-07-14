@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ItemController : MonoBehaviour
 {
+    private readonly List<ItemModel> _exceptions = new();
+    
     [SerializeField]
     private ItemSettings _itemSettings;
     [SerializeField]
@@ -32,7 +35,8 @@ public class ItemController : MonoBehaviour
                 item.transform.position = map[x, y].position;
                 _items[x, y] = item;
                 
-                ShowItem(item, x, y);
+                _exceptions.Clear();
+                ShowItem(item, x, y, _exceptions);
             }   
         }
         
@@ -40,14 +44,16 @@ public class ItemController : MonoBehaviour
         _movementController.Initialize(_matchThreeController, _mapIndexProvider, _items);
     }
 
-    private void ShowItem(ItemView item, int row, int column)
+    private void ShowItem(ItemView item, int row, int column, List<ItemModel> exceptions)
     {
-        var randomModel = _itemSettings.GetRandomModel();
+        var modelsExcept = _itemSettings.GetModelsExcept(exceptions);
+        var randomModel = modelsExcept.GetRandomElement();
 
         if (_matchThreeController.IsMatchThreeByModel(randomModel, row, column))
         {
-            var nemRandomModel = _itemSettings.GetRandomModelExcept(randomModel);
-            item.Initialize(nemRandomModel);
+            exceptions.Add(randomModel);
+            
+            ShowItem(item, row, column, exceptions);
         }
         else
         {
