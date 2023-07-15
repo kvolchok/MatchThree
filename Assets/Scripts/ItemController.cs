@@ -10,17 +10,17 @@ public class ItemController : MonoBehaviour
     [SerializeField]
     private ItemView _itemPrefab;
     
-    private MatchThreeController _matchThreeController;
+    private MatchController _matchController;
     private ItemView[,] _items;
 
-    public void Initialize(TileMap tileMap, MatchThreeController matchThreeController)
+    public void Initialize(TileMap tileMap, MatchController matchController)
     {
-        _matchThreeController = matchThreeController;
+        _matchController = matchController;
         _itemSettings.AssignIdToModels();
         
         var map = tileMap.GetMap();
         _items = new ItemView[tileMap.Size.x, tileMap.Size.y];
-        _matchThreeController.Initialize(_items);
+        _matchController.Initialize(_items);
         
         for (var x = 0; x < tileMap.Size.x; x++)
         {
@@ -46,7 +46,7 @@ public class ItemController : MonoBehaviour
         var modelsExcept = _itemSettings.GetModelsExcept(exceptions);
         var randomModel = modelsExcept.GetRandomElement();
 
-        if (_matchThreeController.IsMatchThreeByModel(randomModel, row, column))
+        if (_matchController.IsMatchThreeByModel(randomModel, row, column))
         {
             exceptions.Add(randomModel);
             

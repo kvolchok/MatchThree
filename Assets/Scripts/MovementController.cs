@@ -5,18 +5,18 @@ public class MovementController : MonoBehaviour
 {
     private readonly TweenersAwaiter _tweenersAwaiter = new();
     
-    private MatchThreeController _matchThreeController;
+    private MatchController _matchController;
     private MapIndexProvider _mapIndexProvider;
     private ItemView[,] _items;
     private Camera _camera;
     
     private Vector3 _currentItemPosition;
-    private bool _isMoving;
+    private bool _isAnimationPlaying;
 
-    public void Initialize(MatchThreeController matchThreeController, MapIndexProvider mapIndexProvider,
+    public void Initialize(MatchController matchController, MapIndexProvider mapIndexProvider,
         ItemView[,] items)
     {
-        _matchThreeController = matchThreeController;
+        _matchController = matchController;
         _mapIndexProvider = mapIndexProvider;
         _items = items;
         _camera = Camera.main;
@@ -24,7 +24,7 @@ public class MovementController : MonoBehaviour
 
     private void Update()
     {
-        if (_isMoving)
+        if (_isAnimationPlaying)
         {
             return;
         }
@@ -48,23 +48,20 @@ public class MovementController : MonoBehaviour
         }
         
         var targetItemIndex = _mapIndexProvider.GetTargetItemIndex(movementDirection, currentItemIndex);
-        
-        SwapPlaces(currentItemIndex, targetItemIndex);
-        
+
         var currentItem = _items[currentItemIndex.x, currentItemIndex.y];
         var targetItem = _items[targetItemIndex.x, targetItemIndex.y];
-
-        _isMoving = true;
         
-        if (!_matchThreeController.IsMatchThreeByIndex(currentItemIndex) &&
-            !_matchThreeController.IsMatchThreeByIndex(targetItemIndex))
+        var matches = _matchController.GetMatches(currentItemIndex, targetItemIndex, SwapPlaces);
+        
+        if (matches.Count == 0)
         {
-            SwapPlaces(currentItemIndex, targetItemIndex);
-            ShowDoubleSwapAnimation(currentItem, targetItem, OnStopMoving);
+            ShowDoubleSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
         }
         else
         {
-            ShowSwapAnimation(currentItem, targetItem, OnStopMoving);
+            SwapPlaces(currentItemIndex, targetItemIndex);
+            ShowSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
         }
     }
 
@@ -90,13 +87,12 @@ public class MovementController : MonoBehaviour
     
     private bool IsOutOfRangeDirection(Vector3 direction, Vector2Int targetIndex)
     {
-        if (targetIndex.x - direction.y < 0 || targetIndex.x - direction.y >= _items.GetLength(0) ||
-            targetIndex.y + direction.x < 0 || targetIndex.y + direction.x >= _items.GetLength(1))
-        {
-            return true;
-        }
+        var isOutOfTopBorder = targetIndex.x - direction.y < 0;
+        var isOutOfBottomBorder = targetIndex.x - direction.y >= _items.GetLength(0);
+        var isOutOfLeftBorder = targetIndex.y + direction.x < 0;
+        var isOutOfRightBorder = targetIndex.y + direction.x >= _items.GetLength(1);
 
-        return false;
+        return isOutOfTopBorder || isOutOfBottomBorder || isOutOfLeftBorder || isOutOfRightBorder;
     }
 
     private void SwapPlaces(Vector2Int currentIndex, Vector2Int targetIndex)
@@ -105,8 +101,11 @@ public class MovementController : MonoBehaviour
             (_items[targetIndex.x, targetIndex.y], _items[currentIndex.x, currentIndex.y]);
     }
     
-    private void ShowDoubleSwapAnimation(ItemView currentItem, ItemView targetItem, TweenCallback onMovementCompleted)
-    { 
+    private void ShowDoubleSwapAnimation(ItemView currentItem, ItemView targetItem,
+        TweenCallback onMovementCompleted)
+    {
+        _isAnimationPlaying = true;
+
         var path = new Vector3[2];
         path[0] = targetItem.transform.position;
         path[1] = currentItem.transform.position;
@@ -121,14 +120,16 @@ public class MovementController : MonoBehaviour
 
     private void ShowSwapAnimation(ItemView currentItem, ItemView targetItem, TweenCallback onMovementCompleted)
     {
+        _isAnimationPlaying = true;
+        
         var currentItemTweener = currentItem.ChangePosition(targetItem.transform.position);
         var targetItemTweener = targetItem.ChangePosition(currentItem.transform.position);
         
         _tweenersAwaiter.Await(onMovementCompleted, currentItemTweener, targetItemTweener);
     }
     
-    private void OnStopMoving()
+    private void OnAnimationCompleted()
     {
-        _isMoving = false;
+        _isAnimationPlaying = false;
     }
 }
