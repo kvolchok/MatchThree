@@ -23,7 +23,7 @@ public class MapIndexProvider : MonoBehaviour
         return mapIndex;
     }
     
-    public Vector2Int GetTargetItemIndex(Vector2Int index, Vector3 direction)
+    public Vector2Int GetTargetItemIndex(Vector3 direction, Vector2Int index)
     {
         var x = -(int)direction.y;
         var y = (int)direction.x;

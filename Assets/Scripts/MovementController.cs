@@ -11,10 +11,6 @@ public class MovementController : MonoBehaviour
     private Camera _camera;
     
     private Vector3 _currentItemPosition;
-    private Vector3 _movementDirection;
-    private Vector2Int _currentItemIndex;
-    private Vector2Int _targetItemIndex;
-
     private bool _isMoving;
 
     public void Initialize(MatchThreeController matchThreeController, MapIndexProvider mapIndexProvider,
@@ -37,41 +33,33 @@ public class MovementController : MonoBehaviour
         {
             _currentItemPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
         }
-        
-        if (Input.GetMouseButton(0))
-        {
-            var targetItemPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
-            _movementDirection = (targetItemPosition - _currentItemPosition).normalized;
-
-            _movementDirection.x = Mathf.RoundToInt(_movementDirection.x);
-            _movementDirection.y = Mathf.RoundToInt(_movementDirection.y);
-        }
 
         if (!Input.GetMouseButtonUp(0))
         {
             return;
         }
         
-        _currentItemIndex = _mapIndexProvider.GetIndex(_currentItemPosition);
+        var movementDirection = GetMovementDirection();
+        var currentItemIndex = _mapIndexProvider.GetIndex(_currentItemPosition);
 
-        if (!IsAllowedDirection(_movementDirection, _currentItemIndex))
+        if (!IsAllowedDirection(movementDirection, currentItemIndex))
         {
             return;
         }
         
-        _targetItemIndex = _mapIndexProvider.GetTargetItemIndex(_currentItemIndex, _movementDirection);
+        var targetItemIndex = _mapIndexProvider.GetTargetItemIndex(movementDirection, currentItemIndex);
         
-        SwapPlaces(_currentItemIndex, _targetItemIndex);
+        SwapPlaces(currentItemIndex, targetItemIndex);
         
-        var currentItem = _items[_currentItemIndex.x, _currentItemIndex.y];
-        var targetItem = _items[_targetItemIndex.x, _targetItemIndex.y];
+        var currentItem = _items[currentItemIndex.x, currentItemIndex.y];
+        var targetItem = _items[targetItemIndex.x, targetItemIndex.y];
 
         _isMoving = true;
         
-        if (!_matchThreeController.IsMatchThreeByIndex(_currentItemIndex) &&
-            !_matchThreeController.IsMatchThreeByIndex(_targetItemIndex))
+        if (!_matchThreeController.IsMatchThreeByIndex(currentItemIndex) &&
+            !_matchThreeController.IsMatchThreeByIndex(targetItemIndex))
         {
-            SwapPlaces(_currentItemIndex, _targetItemIndex);
+            SwapPlaces(currentItemIndex, targetItemIndex);
             ShowDoubleSwapAnimation(currentItem, targetItem, OnStopMoving);
         }
         else
@@ -80,25 +68,35 @@ public class MovementController : MonoBehaviour
         }
     }
 
-    private void OnStopMoving()
+    private Vector3 GetMovementDirection()
     {
-        _isMoving = false;
+        var targetItemPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
+        var movementDirection = (targetItemPosition - _currentItemPosition).normalized;
+        movementDirection.x = Mathf.RoundToInt(movementDirection.x);
+        movementDirection.y = Mathf.RoundToInt(movementDirection.y);
+
+        return movementDirection;
+    }
+
+    private bool IsAllowedDirection(Vector3 direction, Vector2Int targetIndex)
+    {
+        return !IsDiagonalDirection(direction) && !IsOutOfRangeDirection(direction, targetIndex);
+    }
+
+    private bool IsDiagonalDirection(Vector3 direction)
+    {
+        return Mathf.Abs(direction.x) - Mathf.Abs(direction.y) == 0;
     }
     
-    private bool IsAllowedDirection(Vector3 direction, Vector2Int index)
+    private bool IsOutOfRangeDirection(Vector3 direction, Vector2Int targetIndex)
     {
-        if (Mathf.Abs(direction.x) - Mathf.Abs(direction.y) == 0)
+        if (targetIndex.x - direction.y < 0 || targetIndex.x - direction.y >= _items.GetLength(0) ||
+            targetIndex.y + direction.x < 0 || targetIndex.y + direction.x >= _items.GetLength(1))
         {
-            return false;
-        }
-        
-        if (index.x - direction.y < 0 || index.x - direction.y >= _items.GetLength(0) ||
-            index.y + direction.x < 0 || index.y + direction.x >= _items.GetLength(1))
-        {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private void SwapPlaces(Vector2Int currentIndex, Vector2Int targetIndex)
@@ -127,5 +125,10 @@ public class MovementController : MonoBehaviour
         var targetItemTweener = targetItem.ChangePosition(currentItem.transform.position);
         
         _tweenersAwaiter.Await(onMovementCompleted, currentItemTweener, targetItemTweener);
+    }
+    
+    private void OnStopMoving()
+    {
+        _isMoving = false;
     }
 }
