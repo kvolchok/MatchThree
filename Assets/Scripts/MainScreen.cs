@@ -11,13 +11,15 @@ public class MainScreen : MonoBehaviour
     private MapIndexProvider _mapIndexProvider;
     [SerializeField]
     private MovementController _movementController;
-    [SerializeField]
+    
     private MatchThreeController _matchThreeController;
 
     private void Awake()
     {
         _tileMap.Initialize();
         _mapIndexProvider.Initialize(_tileMap);
+
+        _matchThreeController = new MatchThreeController();
         _itemController.Initialize(_tileMap, _matchThreeController);
         
         var itemViews = _itemController.GetItems();

@@ -17,7 +17,8 @@ public class MovementController : MonoBehaviour
 
     private bool _isMoving;
 
-    public void Initialize(MatchThreeController matchThreeController, MapIndexProvider mapIndexProvider, ItemView[,] items)
+    public void Initialize(MatchThreeController matchThreeController, MapIndexProvider mapIndexProvider,
+        ItemView[,] items)
     {
         _matchThreeController = matchThreeController;
         _mapIndexProvider = mapIndexProvider;

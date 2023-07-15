@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MatchThreeController : MonoBehaviour
+public class MatchThreeController
 {
     private ItemView[,] _items;
 
