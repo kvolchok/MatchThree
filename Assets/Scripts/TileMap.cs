@@ -7,9 +7,7 @@ public class TileMap : MonoBehaviour
 
     [field:SerializeField]
     public float NextSpawnDistance { get; private set; }
-
-    [SerializeField]
-    private Transform _startSpawnPoint;
+    
     [SerializeField]
     private Transform _tilePrefab;
 
@@ -17,13 +15,17 @@ public class TileMap : MonoBehaviour
 
     public void Initialize()
     {
-        _tiles = new Transform[Size.x, Size.y];
+        var halfMapSize = Size / 2;
+        var startSpawnPoint = new Vector3(-halfMapSize.x * NextSpawnDistance, halfMapSize.y * NextSpawnDistance,
+            transform.position.z);
         
+        _tiles = new Transform[Size.x, Size.y];
+
         for (var x = 0; x < Size.x; x++)
         {
             for (var y = 0; y < Size.y; y++)
             {
-                var spawnPosition = _startSpawnPoint.localPosition + new Vector3(y, -x) * NextSpawnDistance;
+                var spawnPosition = startSpawnPoint + new Vector3(y, -x) * NextSpawnDistance;
                 var tile = Instantiate(_tilePrefab, transform);
                 tile.localPosition = spawnPosition;
                 _tiles[x, y] = tile;
