@@ -11,11 +11,13 @@ public class ItemController : MonoBehaviour
     private ItemView _itemPrefab;
     
     private MatchController _matchController;
+    private AnimationsManager _animationsManager;
     private ItemView[,] _items;
 
-    public void Initialize(TileMap tileMap, MatchController matchController)
+    public void Initialize(TileMap tileMap, MatchController matchController, AnimationsManager animationsManager)
     {
         _matchController = matchController;
+        _animationsManager = animationsManager;
         _itemSettings.AssignIdToModels();
         
         var map = tileMap.GetMap();
@@ -55,6 +57,7 @@ public class ItemController : MonoBehaviour
         else
         {
             item.Initialize(randomModel);
+            _animationsManager.ShowAppearItemAnimation(item);
         }
     }
 }

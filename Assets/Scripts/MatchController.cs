@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class MatchController
 {
     private readonly List<Match> _matches = new();
-    private readonly List<Vector2Int> _tempMatches = new();
+    private readonly List<ItemView> _tempMatches = new();
 
     private ItemView[,] _items;
+    private Tweener _itemTweener;
 
     public void Initialize(ItemView[,] items)
     {
@@ -19,19 +21,7 @@ public class MatchController
         return IsVerticalMatch(randomModel, row, column) || IsHorizontalMatch(randomModel, row, column);
     }
     
-    private bool IsVerticalMatch(ItemModel randomModel, int row, int column)
-    {
-        return row > 1 &&
-               randomModel.Id == _items[row - 2, column].Id && randomModel.Id == _items[row - 1, column].Id;
-    }
-
-    private bool IsHorizontalMatch(ItemModel randomModel, int row, int column)
-    {
-        return column > 1 &&
-               randomModel.Id == _items[row, column - 2].Id && randomModel.Id == _items[row, column - 1].Id;
-    }
-
-    public List<Match> GetMatches(Vector2Int currentIndex, Vector2Int targetIndex,
+    public List<Match> GetMatchesAfterSwap(Vector2Int currentIndex, Vector2Int targetIndex,
         Action<Vector2Int, Vector2Int> swapPlaces)
     {
         _matches.Clear();
@@ -50,6 +40,18 @@ public class MatchController
         return _matches;
     }
 
+    private bool IsVerticalMatch(ItemModel randomModel, int row, int column)
+    {
+        return row > 1 &&
+               randomModel.Id == _items[row - 2, column].Id && randomModel.Id == _items[row - 1, column].Id;
+    }
+
+    private bool IsHorizontalMatch(ItemModel randomModel, int row, int column)
+    {
+        return column > 1 &&
+               randomModel.Id == _items[row, column - 2].Id && randomModel.Id == _items[row, column - 1].Id;
+    }
+
     private void FindHorizontalMatch(Vector2Int startIndex, int itemId)
     {
         for (var i = startIndex.y; i < _items.GetLength(0); i++)
@@ -60,7 +62,8 @@ public class MatchController
             }
 
             var matchIndex = new Vector2Int(startIndex.x, i);
-            _tempMatches.Add(matchIndex);
+            var itemView = _items[matchIndex.x, matchIndex.y];
+            _tempMatches.Add(itemView);
         }
         
         for (var i = startIndex.y - 1; i >= 0; i--)
@@ -71,7 +74,8 @@ public class MatchController
             }
 
             var matchIndex = new Vector2Int(startIndex.x, i);
-            _tempMatches.Add(matchIndex);
+            var itemView = _items[matchIndex.x, matchIndex.y];
+            _tempMatches.Add(itemView);
         }
 
         CheckForMatches();
@@ -87,7 +91,8 @@ public class MatchController
             }
 
             var matchIndex = new Vector2Int(i, startIndex.y);
-            _tempMatches.Add(matchIndex);
+            var itemView = _items[matchIndex.x, matchIndex.y];
+            _tempMatches.Add(itemView);
         }
         
         for (var i = startIndex.x - 1; i >= 0; i--)
@@ -98,7 +103,8 @@ public class MatchController
             }
 
             var matchIndex = new Vector2Int(i, startIndex.y);
-            _tempMatches.Add(matchIndex);
+            var itemView = _items[matchIndex.x, matchIndex.y];
+            _tempMatches.Add(itemView);
         }
         
         CheckForMatches();

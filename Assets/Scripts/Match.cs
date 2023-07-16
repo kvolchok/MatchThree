@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 public readonly struct Match
 {
-    private readonly List<Vector2Int> _indices;
+    public List<ItemView> Items { get; }
 
-    public Match(List<Vector2Int> indices)
+    public Match(List<ItemView> items)
     {
-        _indices = indices;
+        Items = items;
     }
 }
