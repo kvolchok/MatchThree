@@ -11,6 +11,8 @@ public class MainScreen : MonoBehaviour
     private MapIndexProvider _mapIndexProvider;
     [SerializeField]
     private MovementController _movementController;
+    [SerializeField]
+    private AnimationsManager _animationsManager;
     
     private MatchController _matchController;
 
@@ -20,9 +22,9 @@ public class MainScreen : MonoBehaviour
         _mapIndexProvider.Initialize(_tileMap);
 
         _matchController = new MatchController();
-        _itemController.Initialize(_tileMap, _matchController);
+        _itemController.Initialize(_tileMap, _matchController, _animationsManager);
         
         var itemViews = _itemController.GetItems();
-        _movementController.Initialize(_matchController, _mapIndexProvider, itemViews);
+        _movementController.Initialize(_matchController, _mapIndexProvider, _animationsManager, itemViews);
     }
 }

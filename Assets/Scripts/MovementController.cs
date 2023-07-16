@@ -1,12 +1,10 @@
-using DG.Tweening;
 using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
-    private readonly TweenersAwaiter _tweenersAwaiter = new();
-    
     private MatchController _matchController;
     private MapIndexProvider _mapIndexProvider;
+    private AnimationsManager _animationsManager;
     private ItemView[,] _items;
     private Camera _camera;
     
@@ -14,10 +12,11 @@ public class MovementController : MonoBehaviour
     private bool _isAnimationPlaying;
 
     public void Initialize(MatchController matchController, MapIndexProvider mapIndexProvider,
-        ItemView[,] items)
+        AnimationsManager animationsManager, ItemView[,] items)
     {
         _matchController = matchController;
         _mapIndexProvider = mapIndexProvider;
+        _animationsManager = animationsManager;
         _items = items;
         _camera = Camera.main;
     }
@@ -51,17 +50,18 @@ public class MovementController : MonoBehaviour
 
         var currentItem = _items[currentItemIndex.x, currentItemIndex.y];
         var targetItem = _items[targetItemIndex.x, targetItemIndex.y];
-        
-        var matches = _matchController.GetMatches(currentItemIndex, targetItemIndex, SwapPlaces);
-        
+
+        var matches = _matchController.GetMatchesAfterSwap(currentItemIndex, targetItemIndex, SwapPlaces);
+
         if (matches.Count == 0)
         {
-            ShowDoubleSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
+            _animationsManager.ShowDoubleSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
         }
         else
         {
             SwapPlaces(currentItemIndex, targetItemIndex);
-            ShowSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
+
+            _animationsManager.ShowSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
         }
     }
 
@@ -100,34 +100,7 @@ public class MovementController : MonoBehaviour
         (_items[currentIndex.x, currentIndex.y], _items[targetIndex.x, targetIndex.y]) =
             (_items[targetIndex.x, targetIndex.y], _items[currentIndex.x, currentIndex.y]);
     }
-    
-    private void ShowDoubleSwapAnimation(ItemView currentItem, ItemView targetItem,
-        TweenCallback onMovementCompleted)
-    {
-        _isAnimationPlaying = true;
 
-        var path = new Vector3[2];
-        path[0] = targetItem.transform.position;
-        path[1] = currentItem.transform.position;
-        var currentItemTweener = currentItem.ChangePosition(path);
-
-        path[0] = currentItem.transform.position;
-        path[1] = targetItem.transform.position;
-        var targetItemTweener = targetItem.ChangePosition(path);
-        
-        _tweenersAwaiter.Await(onMovementCompleted, currentItemTweener, targetItemTweener);
-    }
-
-    private void ShowSwapAnimation(ItemView currentItem, ItemView targetItem, TweenCallback onMovementCompleted)
-    {
-        _isAnimationPlaying = true;
-        
-        var currentItemTweener = currentItem.ChangePosition(targetItem.transform.position);
-        var targetItemTweener = targetItem.ChangePosition(currentItem.transform.position);
-        
-        _tweenersAwaiter.Await(onMovementCompleted, currentItemTweener, targetItemTweener);
-    }
-    
     private void OnAnimationCompleted()
     {
         _isAnimationPlaying = false;
