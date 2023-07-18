@@ -6,7 +6,6 @@ using UnityEngine;
 public class MatchController
 {
     private readonly List<Match> _matches = new();
-    private readonly List<ItemView> _tempMatches = new();
 
     private ItemView[,] _items;
     private Tweener _itemTweener;
@@ -30,10 +29,17 @@ public class MatchController
         var currentItem = _items[currentIndex.x, currentIndex.y];
         var targetItem = _items[targetIndex.x, targetIndex.y];
 
-        FindHorizontalMatch(currentIndex, currentItem.Id);
-        FindVerticalMatch(currentIndex, currentItem.Id);
-        FindHorizontalMatch(targetIndex, targetItem.Id);
-        FindVerticalMatch(targetIndex, targetItem.Id);
+        var match = FindHorizontalMatch(currentIndex, currentItem.Id);
+        TryAddMatch(match);
+
+        match = FindVerticalMatch(currentIndex, currentItem.Id);
+        TryAddMatch(match);
+
+        match = FindHorizontalMatch(targetIndex, targetItem.Id);
+        TryAddMatch(match);
+
+        match = FindVerticalMatch(targetIndex, targetItem.Id);
+        TryAddMatch(match);
 
         swapPlaces?.Invoke(currentIndex, targetIndex);
 
@@ -52,8 +58,10 @@ public class MatchController
                randomModel.Id == _items[row, column - 2].Id && randomModel.Id == _items[row, column - 1].Id;
     }
 
-    private void FindHorizontalMatch(Vector2Int startIndex, int itemId)
+    private Match FindHorizontalMatch(Vector2Int startIndex, int itemId)
     {
+        var match = new Match();
+        
         for (var i = startIndex.y; i < _items.GetLength(0); i++)
         {
             if (_items[startIndex.x, i].Id != itemId)
@@ -63,7 +71,7 @@ public class MatchController
 
             var matchIndex = new Vector2Int(startIndex.x, i);
             var itemView = _items[matchIndex.x, matchIndex.y];
-            _tempMatches.Add(itemView);
+            match.Add(itemView);
         }
         
         for (var i = startIndex.y - 1; i >= 0; i--)
@@ -75,14 +83,16 @@ public class MatchController
 
             var matchIndex = new Vector2Int(startIndex.x, i);
             var itemView = _items[matchIndex.x, matchIndex.y];
-            _tempMatches.Add(itemView);
+            match.Add(itemView);
         }
 
-        CheckForMatches();
+        return match;
     }
 
-    private void FindVerticalMatch(Vector2Int startIndex, int itemId)
+    private Match FindVerticalMatch(Vector2Int startIndex, int itemId)
     {
+        var match = new Match();
+
         for (var i = startIndex.x; i < _items.GetLength(1); i++)
         {
             if (_items[i, startIndex.y].Id != itemId)
@@ -92,7 +102,7 @@ public class MatchController
 
             var matchIndex = new Vector2Int(i, startIndex.y);
             var itemView = _items[matchIndex.x, matchIndex.y];
-            _tempMatches.Add(itemView);
+            match.Add(itemView);
         }
         
         for (var i = startIndex.x - 1; i >= 0; i--)
@@ -104,24 +114,22 @@ public class MatchController
 
             var matchIndex = new Vector2Int(i, startIndex.y);
             var itemView = _items[matchIndex.x, matchIndex.y];
-            _tempMatches.Add(itemView);
+            match.Add(itemView);
         }
-        
-        CheckForMatches();
+
+        return match;
     }
     
-    private void CheckForMatches()
+    private void TryAddMatch(Match match)
     {
-        if (_tempMatches.Count < 3)
+        if (HasEnoughMatchesCount(match))
         {
-            _tempMatches.Clear();
-        }
-        else
-        {
-            var match = new Match(_tempMatches);
             _matches.Add(match);
         }
-        
-        _tempMatches.Clear();
+    }
+    
+    private bool HasEnoughMatchesCount(Match match)
+    {
+        return match.Items.Count >= 3;
     }
 }

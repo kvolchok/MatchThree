@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 
-public readonly struct Match
+public struct Match
 {
-    public List<ItemView> Items { get; }
+    public List<ItemView> Items { get; private set; }
 
-    public Match(List<ItemView> items)
+    public void Add(ItemView itemView)
     {
-        Items = items;
+        Items ??= new List<ItemView>();
+
+        Items.Add(itemView);
     }
 }
