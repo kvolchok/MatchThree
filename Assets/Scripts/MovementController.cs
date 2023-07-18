@@ -48,21 +48,7 @@ public class MovementController : MonoBehaviour
         
         var targetItemIndex = _mapIndexProvider.GetTargetItemIndex(movementDirection, currentItemIndex);
 
-        var currentItem = _items[currentItemIndex.x, currentItemIndex.y];
-        var targetItem = _items[targetItemIndex.x, targetItemIndex.y];
-
-        var matches = _matchController.GetMatchesAfterSwap(currentItemIndex, targetItemIndex, SwapPlaces);
-
-        if (matches.Count == 0)
-        {
-            _animationsManager.ShowDoubleSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
-        }
-        else
-        {
-            SwapPlaces(currentItemIndex, targetItemIndex);
-
-            _animationsManager.ShowSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
-        }
+        TryFindMatchesAfterSwap(currentItemIndex, targetItemIndex);
     }
 
     private Vector3 GetMovementDirection()
@@ -75,9 +61,9 @@ public class MovementController : MonoBehaviour
         return movementDirection;
     }
 
-    private bool IsAllowedDirection(Vector3 direction, Vector2Int targetIndex)
+    private bool IsAllowedDirection(Vector3 direction, Vector2Int currentIndex)
     {
-        return !IsDiagonalDirection(direction) && !IsOutOfRangeDirection(direction, targetIndex);
+        return !IsDiagonalDirection(direction) && !IsOutOfRangeDirection(direction, currentIndex);
     }
 
     private bool IsDiagonalDirection(Vector3 direction)
@@ -85,14 +71,33 @@ public class MovementController : MonoBehaviour
         return Mathf.Abs(direction.x) - Mathf.Abs(direction.y) == 0;
     }
     
-    private bool IsOutOfRangeDirection(Vector3 direction, Vector2Int targetIndex)
+    private bool IsOutOfRangeDirection(Vector3 direction, Vector2Int currentIndex)
     {
-        var isOutOfTopBorder = targetIndex.x - direction.y < 0;
-        var isOutOfBottomBorder = targetIndex.x - direction.y >= _items.GetLength(0);
-        var isOutOfLeftBorder = targetIndex.y + direction.x < 0;
-        var isOutOfRightBorder = targetIndex.y + direction.x >= _items.GetLength(1);
+        var isOutOfTopBorder = currentIndex.x - direction.y < 0;
+        var isOutOfBottomBorder = currentIndex.x - direction.y >= _items.GetLength(0);
+        var isOutOfLeftBorder = currentIndex.y + direction.x < 0;
+        var isOutOfRightBorder = currentIndex.y + direction.x >= _items.GetLength(1);
 
         return isOutOfTopBorder || isOutOfBottomBorder || isOutOfLeftBorder || isOutOfRightBorder;
+    }
+    
+    private void TryFindMatchesAfterSwap(Vector2Int currentIndex, Vector2Int targetIndex)
+    {
+        var currentItem = _items[currentIndex.x, currentIndex.y];
+        var targetItem = _items[targetIndex.x, targetIndex.y];
+
+        var matches = _matchController.GetMatchesAfterSwap(currentIndex, targetIndex, SwapPlaces);
+
+        if (matches.Count == 0)
+        {
+            _animationsManager.ShowDoubleSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
+        }
+        else
+        {
+            SwapPlaces(currentIndex, targetIndex);
+
+            _animationsManager.ShowSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
+        }
     }
 
     private void SwapPlaces(Vector2Int currentIndex, Vector2Int targetIndex)
