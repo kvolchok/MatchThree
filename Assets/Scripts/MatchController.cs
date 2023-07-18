@@ -29,16 +29,16 @@ public class MatchController
         var currentItem = _items[currentIndex.x, currentIndex.y];
         var targetItem = _items[targetIndex.x, targetIndex.y];
 
-        var match = FindHorizontalMatch(currentIndex, currentItem.Id);
+        var match = GetHorizontalMatch(currentIndex, currentItem.Id);
         TryAddMatch(match);
 
-        match = FindVerticalMatch(currentIndex, currentItem.Id);
+        match = GetVerticalMatch(currentIndex, currentItem.Id);
         TryAddMatch(match);
 
-        match = FindHorizontalMatch(targetIndex, targetItem.Id);
+        match = GetHorizontalMatch(targetIndex, targetItem.Id);
         TryAddMatch(match);
 
-        match = FindVerticalMatch(targetIndex, targetItem.Id);
+        match = GetVerticalMatch(targetIndex, targetItem.Id);
         TryAddMatch(match);
 
         swapPlaces?.Invoke(currentIndex, targetIndex);
@@ -58,7 +58,7 @@ public class MatchController
                randomModel.Id == _items[row, column - 2].Id && randomModel.Id == _items[row, column - 1].Id;
     }
 
-    private Match FindHorizontalMatch(Vector2Int startIndex, int itemId)
+    private Match GetHorizontalMatch(Vector2Int startIndex, int itemId)
     {
         var match = new Match();
         
@@ -89,7 +89,7 @@ public class MatchController
         return match;
     }
 
-    private Match FindVerticalMatch(Vector2Int startIndex, int itemId)
+    private Match GetVerticalMatch(Vector2Int startIndex, int itemId)
     {
         var match = new Match();
 

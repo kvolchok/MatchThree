@@ -87,7 +87,8 @@ public class MovementController : MonoBehaviour
         var targetItem = _items[targetIndex.x, targetIndex.y];
 
         var matches = _matchController.GetMatchesAfterSwap(currentIndex, targetIndex, SwapPlaces);
-
+        
+        _isAnimationPlaying = true;
         if (matches.Count == 0)
         {
             _animationsManager.ShowDoubleSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
@@ -95,8 +96,7 @@ public class MovementController : MonoBehaviour
         else
         {
             SwapPlaces(currentIndex, targetIndex);
-
-            _animationsManager.ShowSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
+            _animationsManager.ShowMatchAnimation(currentItem, targetItem, matches, OnAnimationCompleted);
         }
     }
 

@@ -11,4 +11,9 @@ public class ItemView : MonoBehaviour
         Id = model.Id;
         _spriteRenderer.sprite = model.Icon;
     }
+
+    public void DestroyItemView()
+    {
+        Destroy(gameObject);
+    }
 }
