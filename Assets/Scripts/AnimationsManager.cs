@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class AnimationsManager : MonoBehaviour
 {
+    public event TweenCallback OnItemsMatched;
+    
     [SerializeField]
     private float _endScale;
     [SerializeField]
@@ -44,13 +46,19 @@ public class AnimationsManager : MonoBehaviour
 
         firstSequence.Join(secondSequence);
         
-        var thirdSequence = GetRemovingMatchesSequence(matches);
+        var thirdSequence = GetMatchSequence(matches);
 
         firstSequence.Append(thirdSequence);
         firstSequence.Play().OnComplete(onMovementCompleted);
     }
 
-    private Sequence GetRemovingMatchesSequence(List<Match> matches)
+    public void ShowDropItemsAnimation(ItemView currentItem, ItemView targetItem)
+    {
+        currentItem.transform.DOMove(targetItem.transform.position, _movementDuration);
+        targetItem.transform.DOMove(currentItem.transform.position, _movementDuration);
+    }
+
+    private Sequence GetMatchSequence(List<Match> matches)
     {
         var sequence = DOTween.Sequence();
         
@@ -58,11 +66,11 @@ public class AnimationsManager : MonoBehaviour
         {
             foreach (var matchItem in match.Items)
             {
-                sequence.Join(matchItem.transform.DOScale(Vector3.zero, _scaleDuration)
-                    .OnComplete(matchItem.DestroyItemView));
+                sequence.Join(matchItem.transform.DOScale(Vector3.zero, _scaleDuration));
             }
         }
 
+        sequence.OnComplete(OnItemsMatched);
         return sequence;
     }
 }

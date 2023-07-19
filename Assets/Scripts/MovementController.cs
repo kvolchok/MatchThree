@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MovementController : MonoBehaviour
@@ -5,7 +6,9 @@ public class MovementController : MonoBehaviour
     private MatchController _matchController;
     private MapIndexProvider _mapIndexProvider;
     private AnimationsManager _animationsManager;
+    
     private ItemView[,] _items;
+    private DropController _dropController;
     private Camera _camera;
     
     private Vector3 _currentItemPosition;
@@ -17,7 +20,11 @@ public class MovementController : MonoBehaviour
         _matchController = matchController;
         _mapIndexProvider = mapIndexProvider;
         _animationsManager = animationsManager;
+        
+        _animationsManager.OnItemsMatched += OnItemsMatched;
+        
         _items = items;
+        _dropController = new DropController(_items);
         _camera = Camera.main;
     }
 
@@ -110,4 +117,33 @@ public class MovementController : MonoBehaviour
     {
         _isAnimationPlaying = false;
     }
+
+    private void OnItemsMatched()
+    {
+        _dropController.CalculateHolesInColumns();
+        var dropItems = _dropController.GetDropItems();
+        DropItems(dropItems);
+    }
+
+    private void DropItems(List<DropItem> dropItems)
+    {
+        foreach (var dropItem in dropItems)
+        {
+            var currentItem = _items[dropItem.CurrentCoordinates.x, dropItem.CurrentCoordinates.y];
+            var targetItem = _items[dropItem.TargetCoordinates.x, dropItem.TargetCoordinates.y];
+            _animationsManager.ShowDropItemsAnimation(currentItem, targetItem);
+        }
+
+        for (var i = dropItems.Count - 1; i >= 0; i--)
+        {
+            var dropItem = dropItems[i];
+            SwapPlaces(dropItem.TargetCoordinates, dropItem.CurrentCoordinates);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        _animationsManager.OnItemsMatched -= OnItemsMatched;
+    }
+    
 }

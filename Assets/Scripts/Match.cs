@@ -7,7 +7,7 @@ public struct Match
     public void Add(ItemView itemView)
     {
         Items ??= new List<ItemView>();
-
+        
         Items.Add(itemView);
     }
 }

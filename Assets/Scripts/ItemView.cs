@@ -3,6 +3,8 @@ using UnityEngine;
 public class ItemView : MonoBehaviour
 {
     public int Id { get; private set; }
+    public bool IsMatched { get; private set; }
+    
     [SerializeField]
     private SpriteRenderer _spriteRenderer;
 
@@ -10,6 +12,11 @@ public class ItemView : MonoBehaviour
     {
         Id = model.Id;
         _spriteRenderer.sprite = model.Icon;
+    }
+
+    public void MarkAsMatched()
+    {
+        IsMatched = true;
     }
 
     public void DestroyItemView()

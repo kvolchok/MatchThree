@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using DG.Tweening;
 using UnityEngine;
 
 public class MatchController
@@ -8,7 +7,6 @@ public class MatchController
     private readonly List<Match> _matches = new();
 
     private ItemView[,] _items;
-    private Tweener _itemTweener;
 
     public void Initialize(ItemView[,] items)
     {
@@ -68,9 +66,8 @@ public class MatchController
             {
                 break;
             }
-
-            var matchIndex = new Vector2Int(startIndex.x, i);
-            var itemView = _items[matchIndex.x, matchIndex.y];
+            
+            var itemView = _items[startIndex.x, i];
             match.Add(itemView);
         }
         
@@ -80,9 +77,8 @@ public class MatchController
             {
                 break;
             }
-
-            var matchIndex = new Vector2Int(startIndex.x, i);
-            var itemView = _items[matchIndex.x, matchIndex.y];
+            
+            var itemView = _items[startIndex.x, i];
             match.Add(itemView);
         }
 
@@ -99,9 +95,8 @@ public class MatchController
             {
                 break;
             }
-
-            var matchIndex = new Vector2Int(i, startIndex.y);
-            var itemView = _items[matchIndex.x, matchIndex.y];
+            
+            var itemView = _items[i, startIndex.y];
             match.Add(itemView);
         }
         
@@ -111,9 +106,8 @@ public class MatchController
             {
                 break;
             }
-
-            var matchIndex = new Vector2Int(i, startIndex.y);
-            var itemView = _items[matchIndex.x, matchIndex.y];
+            
+            var itemView = _items[i, startIndex.y];
             match.Add(itemView);
         }
 
@@ -122,9 +116,20 @@ public class MatchController
     
     private void TryAddMatch(Match match)
     {
-        if (HasEnoughMatchesCount(match))
+        if (!HasEnoughMatchesCount(match))
         {
-            _matches.Add(match);
+            return;
+        }
+        
+        MarkMatchedItems(match);
+        _matches.Add(match);
+    }
+
+    private void MarkMatchedItems(Match match)
+    {
+        foreach (var matchItem in match.Items)
+        {
+            matchItem.MarkAsMatched();
         }
     }
     
