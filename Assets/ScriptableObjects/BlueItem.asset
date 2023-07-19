@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b5c60122039e45ed97f32c898821a8fa, type: 3}
-  m_Name: OrangeElement
+  m_Name: BlueItem
   m_EditorClassIdentifier: 
-  <Type>k__BackingField: 2
-  <Icon>k__BackingField: {fileID: 21300000, guid: 3d0644c81493cef489c48ada5a03493c, type: 3}
+  <Type>k__BackingField: 3
+  <Icon>k__BackingField: {fileID: 21300000, guid: 495aafbde5a45ea40991ec76f52c841d, type: 3}

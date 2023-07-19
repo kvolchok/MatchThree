@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemController : MonoBehaviour
+public class ItemSpawner : MonoBehaviour
 {
     private readonly List<ItemModel> _exceptions = new();
 
@@ -14,12 +14,15 @@ public class ItemController : MonoBehaviour
     private AnimationsManager _animationsManager;
     private ItemView[,] _items;
 
-    public void Initialize(TileMap tileMap, MatchController matchController, AnimationsManager animationsManager)
+    public void Initialize(MatchController matchController, AnimationsManager animationsManager)
     {
         _matchController = matchController;
         _animationsManager = animationsManager;
         _itemSettings.AssignIdToModels();
+    }
 
+    public ItemView[,] GetItems(TileMap tileMap)
+    {
         var map = tileMap.GetMap();
         _items = new ItemView[tileMap.Size.x, tileMap.Size.y];
         _matchController.Initialize(_items);
@@ -36,10 +39,7 @@ public class ItemController : MonoBehaviour
                 ShowItem(item, x, y, _exceptions);
             }
         }
-    }
-
-    public ItemView[,] GetItems()
-    {
+        
         return _items;
     }
 
