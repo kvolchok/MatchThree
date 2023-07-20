@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
+    public event Action OnDropItems;
+    
     private MatchController _matchController;
     private MapIndexProvider _mapIndexProvider;
     private AnimationsManager _animationsManager;
@@ -20,9 +23,7 @@ public class MovementController : MonoBehaviour
         _matchController = matchController;
         _mapIndexProvider = mapIndexProvider;
         _animationsManager = animationsManager;
-        
-        _animationsManager.OnItemsMatched += OnItemsMatched;
-        
+
         _items = items;
         _dropController = new DropController(_items);
         _camera = Camera.main;
@@ -103,7 +104,7 @@ public class MovementController : MonoBehaviour
         else
         {
             SwapPlaces(currentIndex, targetIndex);
-            _animationsManager.ShowMatchAnimation(currentItem, targetItem, matches, OnAnimationCompleted);
+            _animationsManager.ShowMatchAnimation(currentItem, targetItem, matches, OnItemsMatched);
         }
     }
 
@@ -127,12 +128,7 @@ public class MovementController : MonoBehaviour
 
     private void DropItems(List<DropItem> dropItems)
     {
-        foreach (var dropItem in dropItems)
-        {
-            var currentItem = _items[dropItem.CurrentCoordinates.x, dropItem.CurrentCoordinates.y];
-            var targetItem = _items[dropItem.TargetCoordinates.x, dropItem.TargetCoordinates.y];
-            _animationsManager.ShowDropItemsAnimation(currentItem, targetItem);
-        }
+        _animationsManager.ShowDropItemsAnimation(dropItems, _items, TryFindMatchesAfterDropping);
 
         for (var i = dropItems.Count - 1; i >= 0; i--)
         {
@@ -141,9 +137,18 @@ public class MovementController : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
+    private void TryFindMatchesAfterDropping()
     {
-        _animationsManager.OnItemsMatched -= OnItemsMatched;
+        OnDropItems?.Invoke();
+        
+        var allPossibleMatches = _matchController.GetAllPossibleMatches();
+        if (allPossibleMatches.Count != 0)
+        {
+            _animationsManager.GetMatchSequence(allPossibleMatches, OnItemsMatched);
+        }
+        else
+        {
+            OnAnimationCompleted();
+        }
     }
-    
 }

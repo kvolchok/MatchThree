@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemSpawner : MonoBehaviour
+public class ItemsController : MonoBehaviour
 {
     private readonly List<ItemModel> _exceptions = new();
 
@@ -41,6 +41,18 @@ public class ItemSpawner : MonoBehaviour
         }
         
         return _items;
+    }
+
+    public void RemoveMatchedItems()
+    {
+        foreach (var itemView in _items)
+        {
+            if (itemView.IsMatched)
+            {
+                itemView.ChangeMatchState(false);
+                Destroy(itemView.gameObject);
+            }
+        }
     }
 
     private void ShowItem(ItemView item, int row, int column, List<ItemModel> exceptions)

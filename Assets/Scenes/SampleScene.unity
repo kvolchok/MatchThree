@@ -239,7 +239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tileMap: {fileID: 1977658975}
-  _itemSpawner: {fileID: 1977658978}
+  _itemsController: {fileID: 1977658978}
   _mapIndexProvider: {fileID: 1977658973}
   _movementController: {fileID: 1977658972}
   _animationsManager: {fileID: 1977658977}

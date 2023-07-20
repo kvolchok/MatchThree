@@ -43,6 +43,32 @@ public class MatchController
 
         return _matches;
     }
+    
+    public List<Match> GetAllPossibleMatches()
+    {
+        _matches.Clear();
+        
+        for (var x = 0; x < _items.GetLength(0); x++)
+        {
+            for (var y = 0; y < _items.GetLength(1); y++)
+            {
+                var currentItem = _items[x, y];
+                if (currentItem == null)
+                {
+                    continue;
+                }
+
+                var currentIndex = new Vector2Int(x, y);
+                var match = GetHorizontalMatch(currentIndex, currentItem.Id);
+                TryAddMatch(match);
+
+                match = GetVerticalMatch(currentIndex, currentItem.Id);
+                TryAddMatch(match);
+            }   
+        }
+
+        return _matches;
+    }
 
     private bool IsVerticalMatch(ItemModel randomModel, int row, int column)
     {
@@ -62,7 +88,12 @@ public class MatchController
         
         for (var i = startIndex.y; i < _items.GetLength(0); i++)
         {
-            if (_items[startIndex.x, i].Id != itemId)
+            if (_items[startIndex.x, i] == null)
+            {
+                break;
+            }
+
+            if (!_items[startIndex.x, i].enabled || _items[startIndex.x, i].Id != itemId)
             {
                 break;
             }
@@ -73,7 +104,12 @@ public class MatchController
         
         for (var i = startIndex.y - 1; i >= 0; i--)
         {
-            if (_items[startIndex.x, i].Id != itemId)
+            if (_items[startIndex.x, i] == null)
+            {
+                break;
+            }
+
+            if (!_items[startIndex.x, i].enabled || _items[startIndex.x, i].Id != itemId)
             {
                 break;
             }
@@ -91,7 +127,12 @@ public class MatchController
 
         for (var i = startIndex.x; i < _items.GetLength(1); i++)
         {
-            if (_items[i, startIndex.y].Id != itemId)
+            if (_items[i, startIndex.y] == null)
+            {
+                break;
+            }
+
+            if (!_items[i, startIndex.y].enabled || _items[i, startIndex.y].Id != itemId)
             {
                 break;
             }
@@ -102,7 +143,12 @@ public class MatchController
         
         for (var i = startIndex.x - 1; i >= 0; i--)
         {
-            if (_items[i, startIndex.y].Id != itemId)
+            if (_items[i, startIndex.y] == null)
+            {
+                break;
+            }
+
+            if (!_items[i, startIndex.y].enabled || _items[i, startIndex.y].Id != itemId)
             {
                 break;
             }
@@ -116,25 +162,30 @@ public class MatchController
     
     private void TryAddMatch(Match match)
     {
-        if (!HasEnoughMatchesCount(match))
+        if (match.Items == null)
         {
             return;
         }
         
+        if (!HasEnoughMatchesCount(match))
+        {
+            return;
+        }
+
         MarkMatchedItems(match);
         _matches.Add(match);
     }
 
+    private bool HasEnoughMatchesCount(Match match)
+    {
+        return match.Items.Count >= 3;
+    }
+    
     private void MarkMatchedItems(Match match)
     {
         foreach (var matchItem in match.Items)
         {
-            matchItem.MarkAsMatched();
+            matchItem.ChangeMatchState(true);
         }
-    }
-    
-    private bool HasEnoughMatchesCount(Match match)
-    {
-        return match.Items.Count >= 3;
     }
 }

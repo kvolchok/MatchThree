@@ -14,13 +14,8 @@ public class ItemView : MonoBehaviour
         _spriteRenderer.sprite = model.Icon;
     }
 
-    public void MarkAsMatched()
+    public void ChangeMatchState(bool isMatched)
     {
-        IsMatched = true;
-    }
-
-    public void DestroyItemView()
-    {
-        Destroy(gameObject);
+        IsMatched = isMatched;
     }
 }

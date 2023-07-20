@@ -5,7 +5,7 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private TileMap _tileMap;
     [SerializeField]
-    private ItemSpawner _itemSpawner;
+    private ItemsController _itemsController;
     
     [SerializeField]
     private MapIndexProvider _mapIndexProvider;
@@ -22,9 +22,21 @@ public class GameController : MonoBehaviour
         _mapIndexProvider.Initialize(_tileMap);
 
         _matchController = new MatchController();
-        _itemSpawner.Initialize(_matchController, _animationsManager);
+        _itemsController.Initialize(_matchController, _animationsManager);
         
-        var itemViews = _itemSpawner.GetItems(_tileMap);
+        var itemViews = _itemsController.GetItems(_tileMap);
         _movementController.Initialize(_matchController, _mapIndexProvider, _animationsManager, itemViews);
+        
+        _movementController.OnDropItems += OnDropItems;
+    }
+
+    private void OnDropItems()
+    {
+        _itemsController.RemoveMatchedItems();
+    }
+
+    private void OnDestroy()
+    {
+        _movementController.OnDropItems -= OnDropItems;
     }
 }

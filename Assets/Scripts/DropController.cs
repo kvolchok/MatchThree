@@ -15,11 +15,13 @@ public class DropController
     
     public void CalculateHolesInColumns()
     {
+        _holesInColumns.Clear();
+        
         for (var y = 0; y < _items.GetLength(1); y++)
         {
             for (var x = 0; x < _items.GetLength(0); x++)
             {
-                if (!_items[x, y].IsMatched)
+                if (!_items[x, y].IsMatched || !_items[x, y].enabled)
                 {
                     continue;
                 }
@@ -40,6 +42,8 @@ public class DropController
     
     public List<DropItem> GetDropItems()
     {
+        _dropItems.Clear();
+        
         foreach (var (columnNumber, holesCount) in _holesInColumns)
         {
             for (var x = 0; x < _items.GetLength(0); x++)
@@ -49,6 +53,11 @@ public class DropController
                     break;
                 }
                 
+                if (_items[x, columnNumber] == null)
+                {
+                    continue;
+                }
+
                 var currentCoordinates = new Vector2Int(x, columnNumber);
                 var targetCoordinates = new Vector2Int(x + holesCount, columnNumber);
                 var dropItem = new DropItem(currentCoordinates, targetCoordinates);
