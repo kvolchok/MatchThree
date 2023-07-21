@@ -21,12 +21,17 @@ public class DropController
         {
             for (var x = 0; x < _items.GetLength(0); x++)
             {
-                if (_items[x, y] == null)
-                {
-                    continue;
-                }
+                // if (_items[x, y] == null)
+                // {
+                //     continue;
+                // }
                 
-                if (!_items[x, y].IsMatched || !_items[x, y].enabled)
+                // if (!_items[x, y].IsMatched || !_items[x, y].enabled)
+                // {
+                //     continue;
+                // }
+                
+                if (!_items[x, y].IsMatched)
                 {
                     continue;
                 }
@@ -60,10 +65,10 @@ public class DropController
                     break;
                 }
                 
-                if (_items[x, columnNumber] == null)
-                {
-                    continue;
-                }
+                // if (_items[x, columnNumber] == null)
+                // {
+                //     continue;
+                // }
                 
                 if (_items[x, columnNumber].IsMatched)
                 {

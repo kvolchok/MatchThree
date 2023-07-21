@@ -62,11 +62,18 @@ public class ItemsController : MonoBehaviour
         {
             for (var y = 0; y < _items.GetLength(1); y++)
             {
-                if (_items[x, y] != null && _items[x, y].enabled)
+                // if (_items[x, y] != null && _items[x, y].enabled)
+                // {
+                //     continue;
+                // }
+
+                var currentItem = _items[x, y];
+                if (!currentItem.IsMatched)
                 {
                     continue;
                 }
 
+                Destroy(currentItem.gameObject);
                 var item = Instantiate(_itemPrefab, transform);
                 item.transform.position = _map[x, y].position;
                 _items[x, y] = item;

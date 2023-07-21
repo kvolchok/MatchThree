@@ -140,7 +140,7 @@ public class MovementController : MonoBehaviour
 
     private void TryFindMatchesAfterDropping()
     {
-        OnDropItems?.Invoke();
+        // OnDropItems?.Invoke();
         
         var allPossibleMatches = _matchController.GetAllPossibleMatches();
         if (allPossibleMatches.Count != 0)

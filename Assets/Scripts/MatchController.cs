@@ -53,7 +53,12 @@ public class MatchController
             for (var y = 0; y < _items.GetLength(1); y++)
             {
                 var currentItem = _items[x, y];
-                if (currentItem == null)
+                // if (currentItem == null)
+                // {
+                //     continue;
+                // }
+                
+                if (currentItem.IsMatched)
                 {
                     continue;
                 }
@@ -100,12 +105,17 @@ public class MatchController
         
         for (var i = startIndex.y; i < _items.GetLength(0); i++)
         {
-            if (_items[startIndex.x, i] == null)
-            {
-                break;
-            }
-
-            if (!_items[startIndex.x, i].enabled || _items[startIndex.x, i].Id != itemId)
+            // if (_items[startIndex.x, i] == null)
+            // {
+            //     break;
+            // }
+// 
+            // if (!_items[startIndex.x, i].enabled || _items[startIndex.x, i].Id != itemId)
+            // {
+            //     break;
+            // }
+            
+            if (_items[startIndex.x, i].IsMatched || _items[startIndex.x, i].Id != itemId)
             {
                 break;
             }
@@ -116,12 +126,17 @@ public class MatchController
         
         for (var i = startIndex.y - 1; i >= 0; i--)
         {
-            if (_items[startIndex.x, i] == null)
-            {
-                break;
-            }
-
-            if (!_items[startIndex.x, i].enabled || _items[startIndex.x, i].Id != itemId)
+            // if (_items[startIndex.x, i] == null)
+            // {
+            //     break;
+            // }
+// 
+            // if (!_items[startIndex.x, i].enabled || _items[startIndex.x, i].Id != itemId)
+            // {
+            //     break;
+            // }
+            
+            if (_items[startIndex.x, i].IsMatched || _items[startIndex.x, i].Id != itemId)
             {
                 break;
             }
@@ -139,12 +154,17 @@ public class MatchController
 
         for (var i = startIndex.x; i < _items.GetLength(1); i++)
         {
-            if (_items[i, startIndex.y] == null)
-            {
-                break;
-            }
-
-            if (!_items[i, startIndex.y].enabled || _items[i, startIndex.y].Id != itemId)
+            // if (_items[i, startIndex.y] == null)
+            // {
+            //     break;
+            // }
+// 
+            // if (!_items[i, startIndex.y].enabled || _items[i, startIndex.y].Id != itemId)
+            // {
+            //     break;
+            // }
+            
+            if (_items[i, startIndex.y].IsMatched || _items[i, startIndex.y].Id != itemId)
             {
                 break;
             }
@@ -155,12 +175,17 @@ public class MatchController
         
         for (var i = startIndex.x - 1; i >= 0; i--)
         {
-            if (_items[i, startIndex.y] == null)
-            {
-                break;
-            }
-
-            if (!_items[i, startIndex.y].enabled || _items[i, startIndex.y].Id != itemId)
+            // if (_items[i, startIndex.y] == null)
+            // {
+            //     break;
+            // }
+// 
+            // if (!_items[i, startIndex.y].enabled || _items[i, startIndex.y].Id != itemId)
+            // {
+            //     break;
+            // }
+            
+            if (_items[i, startIndex.y].IsMatched || _items[i, startIndex.y].Id != itemId)
             {
                 break;
             }
