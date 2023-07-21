@@ -76,7 +76,10 @@ public class MatchController
                randomModel.Id == _items[row, column - 2].Id && randomModel.Id == _items[row, column - 1].Id ||
                column < _items.GetLength(1) - 2 &&
                _items[row, column + 1] != null && _items[row, column + 2] != null &&
-               randomModel.Id == _items[row, column + 1].Id && randomModel.Id == _items[row, column + 2].Id;
+               randomModel.Id == _items[row, column + 1].Id && randomModel.Id == _items[row, column + 2].Id || 
+               column > 0 && column < _items.GetLength(1) - 1 &&
+               randomModel.Id == _items[row, column - 1].Id &&
+               _items[row, column + 1] != null && randomModel.Id == _items[row, column + 1].Id;
     }
     
     private bool IsVerticalMatch(ItemModel randomModel, int row, int column)
@@ -85,7 +88,10 @@ public class MatchController
                randomModel.Id == _items[row - 2, column].Id && randomModel.Id == _items[row - 1, column].Id ||
                row < _items.GetLength(0) - 2 &&
                _items[row + 1, column] != null && _items[row + 2, column] != null &&
-               randomModel.Id == _items[row + 1, column].Id && randomModel.Id == _items[row + 2, column].Id;
+               randomModel.Id == _items[row + 1, column].Id && randomModel.Id == _items[row + 2, column].Id || 
+               row > 0 && row < _items.GetLength(0) - 1 &&
+               randomModel.Id == _items[row - 1, column].Id &&
+               _items[row + 1, column] != null && randomModel.Id == _items[row + 1, column].Id;
     }
 
     private Match GetHorizontalMatch(Vector2Int startIndex, int itemId)

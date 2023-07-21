@@ -618,7 +618,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c98a83c3990a4537bbb4b1bbc36a85e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Size>k__BackingField: {x: 7, y: 7}
+  <Size>k__BackingField: {x: 5, y: 5}
   <NextSpawnDistance>k__BackingField: 120
   _tilePrefab: {fileID: 8176344540717022162, guid: b069763e161b8ea48bdd0eb1bbe1da12, type: 3}
 --- !u!224 &1977658976
@@ -673,6 +673,4 @@ MonoBehaviour:
     - {fileID: 11400000, guid: db6c8e2bb2d004972af02f448d7d0904, type: 2}
     - {fileID: 11400000, guid: be02ea48727c547be8d27dfbfa4c0d78, type: 2}
     - {fileID: 11400000, guid: 385dc6a32644d46bab8c44e03f508221, type: 2}
-    - {fileID: 11400000, guid: f703c64155df143739768df3f635b4dd, type: 2}
-    - {fileID: 11400000, guid: 9d3dbacf7cd7945f0b61b31aca1b9f9c, type: 2}
   _itemPrefab: {fileID: 3639982624273583253, guid: 7bfb2199544102848833d31a20eb2c68, type: 3}
