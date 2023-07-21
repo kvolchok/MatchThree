@@ -21,6 +21,11 @@ public class DropController
         {
             for (var x = 0; x < _items.GetLength(0); x++)
             {
+                if (_items[x, y] == null)
+                {
+                    continue;
+                }
+                
                 if (!_items[x, y].IsMatched || !_items[x, y].enabled)
                 {
                     continue;
@@ -43,12 +48,14 @@ public class DropController
     public List<DropItem> GetDropItems()
     {
         _dropItems.Clear();
-        
+
         foreach (var (columnNumber, holesCount) in _holesInColumns)
         {
+            var matchesInColumnCounter = holesCount;
+            
             for (var x = 0; x < _items.GetLength(0); x++)
             {
-                if (_items[x, columnNumber].IsMatched)
+                if (matchesInColumnCounter < 0)
                 {
                     break;
                 }
@@ -57,9 +64,15 @@ public class DropController
                 {
                     continue;
                 }
+                
+                if (_items[x, columnNumber].IsMatched)
+                {
+                    matchesInColumnCounter--;
+                    continue;
+                }
 
                 var currentCoordinates = new Vector2Int(x, columnNumber);
-                var targetCoordinates = new Vector2Int(x + holesCount, columnNumber);
+                var targetCoordinates = new Vector2Int(x + matchesInColumnCounter, columnNumber);
                 var dropItem = new DropItem(currentCoordinates, targetCoordinates);
                 _dropItems.Add(dropItem);
             }   
