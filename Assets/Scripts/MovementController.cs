@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class MovementController : MonoBehaviour
-{
-    public event Action OnDropItems;
+{ 
     public event Action OnMatchesNotFound;
     
     private MatchController _matchController;
@@ -123,8 +123,8 @@ public class MovementController : MonoBehaviour
     private void OnItemsMatched()
     {
         _dropController.CalculateHolesInColumns();
-        var dropItems = _dropController.GetDropItems();
-        DropItems(dropItems);
+        var itemsToDrop = _dropController.GetItemsToDrop();
+        DropItems(itemsToDrop);
     }
 
     private void DropItems(List<DropItem> dropItems)
@@ -140,12 +140,12 @@ public class MovementController : MonoBehaviour
 
     private void TryFindMatchesAfterDropping()
     {
-        OnDropItems?.Invoke();
-        
         var allPossibleMatches = _matchController.GetAllPossibleMatches();
+        
         if (allPossibleMatches.Count != 0)
         {
-            _animationsManager.GetMatchSequence(allPossibleMatches, OnItemsMatched);
+            var matchSequence = _animationsManager.GetMatchSequence(allPossibleMatches);
+            matchSequence.OnComplete(OnItemsMatched);
         }
         else
         {

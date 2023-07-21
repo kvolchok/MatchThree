@@ -21,12 +21,7 @@ public class DropController
         {
             for (var x = 0; x < _items.GetLength(0); x++)
             {
-                if (_items[x, y] == null)
-                {
-                    continue;
-                }
-                
-                if (!_items[x, y].IsMatched || !_items[x, y].enabled)
+                if (!_items[x, y].IsMatched)
                 {
                     continue;
                 }
@@ -37,42 +32,37 @@ public class DropController
                 }
                 else
                 {
-                    var holesInColumnCount = _holesInColumns[y];
-                    holesInColumnCount++;
-                    _holesInColumns[y] = holesInColumnCount;
+                    var holesCount = _holesInColumns[y];
+                    holesCount++;
+                    _holesInColumns[y] = holesCount;
                 }
             }   
         }
     }
     
-    public List<DropItem> GetDropItems()
+    public List<DropItem> GetItemsToDrop()
     {
         _dropItems.Clear();
 
         foreach (var (columnNumber, holesCount) in _holesInColumns)
         {
-            var matchesInColumnCounter = holesCount;
+            var matchesInColumnCount = holesCount;
             
             for (var x = 0; x < _items.GetLength(0); x++)
             {
-                if (matchesInColumnCounter < 0)
+                if (matchesInColumnCount < 0)
                 {
                     break;
                 }
-                
-                if (_items[x, columnNumber] == null)
-                {
-                    continue;
-                }
-                
+
                 if (_items[x, columnNumber].IsMatched)
                 {
-                    matchesInColumnCounter--;
+                    matchesInColumnCount--;
                     continue;
                 }
 
                 var currentCoordinates = new Vector2Int(x, columnNumber);
-                var targetCoordinates = new Vector2Int(x + matchesInColumnCounter, columnNumber);
+                var targetCoordinates = new Vector2Int(x + matchesInColumnCount, columnNumber);
                 var dropItem = new DropItem(currentCoordinates, targetCoordinates);
                 _dropItems.Add(dropItem);
             }   

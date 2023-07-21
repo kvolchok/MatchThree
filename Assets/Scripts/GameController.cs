@@ -25,28 +25,23 @@ public class GameController : MonoBehaviour
         _mapIndexProvider.Initialize(_tileMap);
 
         _matchController = new MatchController();
-        _itemsController.Initialize(_matchController, _animationsManager);
+        _itemsController.Initialize(_matchController, _animationsManager, _tileMap);
+        _itemsController.SpawnNewItems();
         
-        var itemViews = _itemsController.GetItems(_tileMap);
+        var itemViews = _itemsController.GetItems();
         _movementController.Initialize(_matchController, _mapIndexProvider, _animationsManager, itemViews);
         
-        _movementController.OnDropItems += OnDropItems;
         _movementController.OnMatchesNotFound += OnMatchesNotFound;
-    }
-
-    private void OnDropItems()
-    {
-        _itemsController.RemoveMatchedItems();
     }
 
     private void OnMatchesNotFound()
     {
+        _itemsController.RemoveMatchedItems();
         _itemsController.SpawnNewItems();
     }
     
     private void OnDestroy()
     {
-        _movementController.OnDropItems -= OnDropItems;
         _movementController.OnMatchesNotFound -= OnMatchesNotFound;
     }
 }

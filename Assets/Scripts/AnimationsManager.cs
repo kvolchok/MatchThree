@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 
@@ -39,7 +40,9 @@ public class AnimationsManager : MonoBehaviour
         firstSequence.Append(currentItem.transform.DOMove(targetItem.transform.position, _movementDuration));
         firstSequence.Join(targetItem.transform.DOMove(currentItem.transform.position, _movementDuration));
 
-        var secondSequence = GetMatchSequence(matches, onAnimationCompleted);
+        var secondSequence = GetMatchSequence(matches);
+        secondSequence.OnComplete(onAnimationCompleted);
+        
         firstSequence.Append(secondSequence);
     }
 
@@ -59,19 +62,15 @@ public class AnimationsManager : MonoBehaviour
         sequence.OnComplete(onAnimationCompleted);
     }
 
-    public Sequence GetMatchSequence(List<Match> matches, TweenCallback onAnimationCompleted)
+    public Sequence GetMatchSequence(IEnumerable<Match> matches)
     {
         var sequence = DOTween.Sequence();
         
-        foreach (var match in matches)
+        foreach (var matchItem in matches.SelectMany(match => match.Items))
         {
-            foreach (var matchItem in match.Items)
-            {
-                sequence.Join(matchItem.transform.DOScale(Vector3.zero, _scaleDuration));
-            }
+            sequence.Join(matchItem.transform.DOScale(Vector3.zero, _scaleDuration));
         }
-
-        sequence.OnComplete(onAnimationCompleted);
+        
         return sequence;
     }
 }
