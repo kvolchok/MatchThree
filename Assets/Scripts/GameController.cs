@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
@@ -18,6 +19,8 @@ public class GameController : MonoBehaviour
 
     private void Awake()
     {
+        DOTween.Init(true, false, LogBehaviour.Default);
+        
         _tileMap.Initialize();
         _mapIndexProvider.Initialize(_tileMap);
 
@@ -28,6 +31,7 @@ public class GameController : MonoBehaviour
         _movementController.Initialize(_matchController, _mapIndexProvider, _animationsManager, itemViews);
         
         _movementController.OnDropItems += OnDropItems;
+        _movementController.OnMatchesNotFound += OnMatchesNotFound;
     }
 
     private void OnDropItems()
@@ -35,8 +39,14 @@ public class GameController : MonoBehaviour
         _itemsController.RemoveMatchedItems();
     }
 
+    private void OnMatchesNotFound()
+    {
+        _itemsController.SpawnNewItems();
+    }
+    
     private void OnDestroy()
     {
         _movementController.OnDropItems -= OnDropItems;
+        _movementController.OnMatchesNotFound -= OnMatchesNotFound;
     }
 }

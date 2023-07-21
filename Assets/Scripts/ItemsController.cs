@@ -6,24 +6,25 @@ public class ItemsController : MonoBehaviour
     private readonly List<ItemModel> _exceptions = new();
 
     [SerializeField]
-    private ItemSettings _itemSettings;
+    private ItemsSettings _itemsSettings;
     [SerializeField]
     private ItemView _itemPrefab;
 
     private MatchController _matchController;
     private AnimationsManager _animationsManager;
     private ItemView[,] _items;
+    private Transform[,] _map;
 
     public void Initialize(MatchController matchController, AnimationsManager animationsManager)
     {
         _matchController = matchController;
         _animationsManager = animationsManager;
-        _itemSettings.AssignIdToModels();
+        _itemsSettings.AssignIdToModels();
     }
 
     public ItemView[,] GetItems(TileMap tileMap)
     {
-        var map = tileMap.GetMap();
+        _map = tileMap.GetMap();
         _items = new ItemView[tileMap.Size.x, tileMap.Size.y];
         _matchController.Initialize(_items);
 
@@ -32,7 +33,7 @@ public class ItemsController : MonoBehaviour
             for (var y = 0; y < tileMap.Size.y; y++)
             {
                 var item = Instantiate(_itemPrefab, transform);
-                item.transform.position = map[x, y].position;
+                item.transform.position = _map[x, y].position;
                 _items[x, y] = item;
 
                 _exceptions.Clear();
@@ -55,9 +56,30 @@ public class ItemsController : MonoBehaviour
         }
     }
 
+    public void SpawnNewItems()
+    {
+        for (var x = 0; x < _items.GetLength(0); x++)
+        {
+            for (var y = 0; y < _items.GetLength(1); y++)
+            {
+                if (_items[x, y] != null && _items[x, y].enabled)
+                {
+                    continue;
+                }
+
+                var item = Instantiate(_itemPrefab, transform);
+                item.transform.position = _map[x, y].position;
+                _items[x, y] = item;
+
+                _exceptions.Clear();
+                ShowItem(item, x, y, _exceptions);
+            }
+        }
+    }
+
     private void ShowItem(ItemView item, int row, int column, List<ItemModel> exceptions)
     {
-        var modelsExcept = _itemSettings.GetModelsExcept(exceptions);
+        var modelsExcept = _itemsSettings.GetModelsExcept(exceptions);
         var randomModel = modelsExcept.GetRandomElement();
 
         if (_matchController.IsMatchThreeByModel(randomModel, row, column))

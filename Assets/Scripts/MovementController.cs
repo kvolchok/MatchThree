@@ -5,6 +5,7 @@ using UnityEngine;
 public class MovementController : MonoBehaviour
 {
     public event Action OnDropItems;
+    public event Action OnMatchesNotFound;
     
     private MatchController _matchController;
     private MapIndexProvider _mapIndexProvider;
@@ -148,6 +149,7 @@ public class MovementController : MonoBehaviour
         }
         else
         {
+            OnMatchesNotFound?.Invoke();
             OnAnimationCompleted();
         }
     }

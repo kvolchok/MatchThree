@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 [Serializable]
-public class ItemSettings
+public class ItemsSettings
 {
     [SerializeField]
     private List<ItemModel> _itemModels;

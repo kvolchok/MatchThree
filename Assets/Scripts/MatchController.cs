@@ -15,7 +15,7 @@ public class MatchController
     
     public bool IsMatchThreeByModel(ItemModel randomModel, int row, int column)
     {
-        return IsVerticalMatch(randomModel, row, column) || IsHorizontalMatch(randomModel, row, column);
+        return IsHorizontalMatch(randomModel, row, column) || IsVerticalMatch(randomModel, row, column);
     }
     
     public List<Match> GetMatchesAfterSwap(Vector2Int currentIndex, Vector2Int targetIndex,
@@ -70,16 +70,22 @@ public class MatchController
         return _matches;
     }
 
-    private bool IsVerticalMatch(ItemModel randomModel, int row, int column)
-    {
-        return row > 1 &&
-               randomModel.Id == _items[row - 2, column].Id && randomModel.Id == _items[row - 1, column].Id;
-    }
-
     private bool IsHorizontalMatch(ItemModel randomModel, int row, int column)
     {
         return column > 1 &&
-               randomModel.Id == _items[row, column - 2].Id && randomModel.Id == _items[row, column - 1].Id;
+               randomModel.Id == _items[row, column - 2].Id && randomModel.Id == _items[row, column - 1].Id ||
+               column < _items.GetLength(1) - 2 &&
+               _items[row, column + 1] != null && _items[row, column + 2] != null &&
+               randomModel.Id == _items[row, column + 1].Id && randomModel.Id == _items[row, column + 2].Id;
+    }
+    
+    private bool IsVerticalMatch(ItemModel randomModel, int row, int column)
+    {
+        return row > 1 &&
+               randomModel.Id == _items[row - 2, column].Id && randomModel.Id == _items[row - 1, column].Id ||
+               row < _items.GetLength(0) - 2 &&
+               _items[row + 1, column] != null && _items[row + 2, column] != null &&
+               randomModel.Id == _items[row + 1, column].Id && randomModel.Id == _items[row + 2, column].Id;
     }
 
     private Match GetHorizontalMatch(Vector2Int startIndex, int itemId)
