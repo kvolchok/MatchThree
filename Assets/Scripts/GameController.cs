@@ -1,4 +1,3 @@
-using DG.Tweening;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
@@ -19,8 +18,6 @@ public class GameController : MonoBehaviour
 
     private void Awake()
     {
-        DOTween.Init(true, false, LogBehaviour.Default);
-        
         _tileMap.Initialize();
         _mapIndexProvider.Initialize(_tileMap);
 
