@@ -2,9 +2,17 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class AnimationsManager : MonoBehaviour
 {
+    [SerializeField]
+    private UnityEvent _noMatchEvent;
+    [SerializeField]
+    private UnityEvent<float> _matchEvent;
+    [SerializeField]
+    private UnityEvent _dropItemsEvent;
+    
     [SerializeField]
     private float _endScale;
     [SerializeField]
@@ -12,38 +20,60 @@ public class AnimationsManager : MonoBehaviour
     [SerializeField]
     private float _movementDuration;
 
-    public void ShowAppearItemAnimation(ItemView itemView)
+    public void ShowSpawnItemAnimation(ItemView itemView)
     {
         itemView.transform.DOScale(_endScale, _scaleDuration);
     }
 
-    public void ShowDoubleSwapAnimation(ItemView currentItem, ItemView targetItem,
+    public void ShowNoMatchAnimation(ItemView currentItem, ItemView targetItem,
         TweenCallback onAnimationCompleted)
     {
         var sequence = DOTween.Sequence();
         var path = new Vector3[2];
         path[0] = targetItem.transform.position;
         path[1] = currentItem.transform.position;
-        sequence.Append(currentItem.transform.DOPath(path, _movementDuration));
+        sequence.Join(currentItem.transform.DOPath(path, _movementDuration));
         
         path[0] = currentItem.transform.position;
         path[1] = targetItem.transform.position;
         sequence.Join(targetItem.transform.DOPath(path, _movementDuration));
         
         sequence.OnComplete(onAnimationCompleted);
+        _noMatchEvent?.Invoke();
     }
 
     public void ShowMatchAnimation(ItemView currentItem, ItemView targetItem, List<Match> matches,
         TweenCallback onAnimationCompleted)
     {
-        var firstSequence = DOTween.Sequence();
-        firstSequence.Append(currentItem.transform.DOMove(targetItem.transform.position, _movementDuration));
-        firstSequence.Join(targetItem.transform.DOMove(currentItem.transform.position, _movementDuration));
+        var firstSequence = GetSwapSequence(currentItem, targetItem);
 
-        var secondSequence = GetMatchSequence(matches);
+        var secondSequence = GetMatchSequence(matches, _movementDuration);
         secondSequence.OnComplete(onAnimationCompleted);
         
         firstSequence.Append(secondSequence);
+    }
+
+    private Sequence GetSwapSequence(ItemView currentItem, ItemView targetItem)
+    {
+        var sequence = DOTween.Sequence();
+        
+        sequence.Join(currentItem.transform.DOMove(targetItem.transform.position, _movementDuration));
+        sequence.Join(targetItem.transform.DOMove(currentItem.transform.position, _movementDuration));
+        
+        return sequence;
+    }
+
+    public Sequence GetMatchSequence(IEnumerable<Match> matches, float soundDelay = 0)
+    {
+        var sequence = DOTween.Sequence();
+        
+        foreach (var matchItem in matches.SelectMany(match => match.Items))
+        {
+            sequence.Join(matchItem.transform.DOScale(Vector3.zero, _scaleDuration));
+        }
+        
+        _matchEvent?.Invoke(soundDelay);
+        return sequence;
     }
 
     public void ShowDropItemsAnimation(List<DropItem> dropItems, ItemView[,] items,
@@ -58,19 +88,8 @@ public class AnimationsManager : MonoBehaviour
             sequence.Join(currentItem.transform.DOMove(targetItem.transform.position, _movementDuration));
             sequence.Join(targetItem.transform.DOMove(currentItem.transform.position, _movementDuration));
         }
-
+        
         sequence.OnComplete(onAnimationCompleted);
-    }
-
-    public Sequence GetMatchSequence(IEnumerable<Match> matches)
-    {
-        var sequence = DOTween.Sequence();
-        
-        foreach (var matchItem in matches.SelectMany(match => match.Items))
-        {
-            sequence.Join(matchItem.transform.DOScale(Vector3.zero, _scaleDuration));
-        }
-        
-        return sequence;
+        _dropItemsEvent?.Invoke();
     }
 }

@@ -100,7 +100,7 @@ public class MovementController : MonoBehaviour
         _isAnimationPlaying = true;
         if (matches.Count == 0)
         {
-            _animationsManager.ShowDoubleSwapAnimation(currentItem, targetItem, OnAnimationCompleted);
+            _animationsManager.ShowNoMatchAnimation(currentItem, targetItem, OnAnimationCompleted);
         }
         else
         {
@@ -124,12 +124,20 @@ public class MovementController : MonoBehaviour
     {
         _dropController.CalculateHolesInColumns();
         var itemsToDrop = _dropController.GetItemsToDrop();
-        DropItems(itemsToDrop);
+        
+        if (itemsToDrop.Count == 0)
+        {
+            TryFindMatchesAfterMatch();    
+        }
+        else
+        {
+            DropItems(itemsToDrop);   
+        }
     }
 
     private void DropItems(List<DropItem> dropItems)
     {
-        _animationsManager.ShowDropItemsAnimation(dropItems, _items, TryFindMatchesAfterDropping);
+        _animationsManager.ShowDropItemsAnimation(dropItems, _items, TryFindMatchesAfterMatch);
 
         for (var i = dropItems.Count - 1; i >= 0; i--)
         {
@@ -138,7 +146,7 @@ public class MovementController : MonoBehaviour
         }
     }
 
-    private void TryFindMatchesAfterDropping()
+    private void TryFindMatchesAfterMatch()
     {
         var allPossibleMatches = _matchController.GetAllPossibleMatches();
         

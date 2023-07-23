@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ItemsController : MonoBehaviour
 {
+    [SerializeField]
+    private UnityEvent _spawnNewItemsEvent;
+    
     private readonly List<ItemModel> _exceptions = new();
 
     [SerializeField]
@@ -45,6 +49,8 @@ public class ItemsController : MonoBehaviour
                 ShowItem(item, x, y, _exceptions);
             }
         }
+        
+        _spawnNewItemsEvent?.Invoke();
     }
 
     public ItemView[,] GetItems()
@@ -77,7 +83,7 @@ public class ItemsController : MonoBehaviour
         else
         {
             item.Initialize(randomModel);
-            _animationsManager.ShowAppearItemAnimation(item);
+            _animationsManager.ShowSpawnItemAnimation(item);
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 public class DropController
 {
     private readonly Dictionary<int, int> _holesInColumns = new();
-    private readonly List<DropItem> _dropItems = new();
+    private readonly List<DropItem> _itemsToDrop = new();
 
     private readonly ItemView[,] _items;
 
@@ -42,7 +42,7 @@ public class DropController
     
     public List<DropItem> GetItemsToDrop()
     {
-        _dropItems.Clear();
+        _itemsToDrop.Clear();
 
         foreach (var (columnNumber, holesCount) in _holesInColumns)
         {
@@ -50,7 +50,7 @@ public class DropController
             
             for (var x = 0; x < _items.GetLength(0); x++)
             {
-                if (matchesInColumnCount < 0)
+                if (matchesInColumnCount <= 0)
                 {
                     break;
                 }
@@ -64,10 +64,10 @@ public class DropController
                 var currentCoordinates = new Vector2Int(x, columnNumber);
                 var targetCoordinates = new Vector2Int(x + matchesInColumnCount, columnNumber);
                 var dropItem = new DropItem(currentCoordinates, targetCoordinates);
-                _dropItems.Add(dropItem);
+                _itemsToDrop.Add(dropItem);
             }   
         }
         
-        return _dropItems;
+        return _itemsToDrop;
     }
 }
