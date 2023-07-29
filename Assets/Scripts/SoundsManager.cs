@@ -19,9 +19,10 @@ public class SoundsManager : MonoBehaviour
         _audioSource.PlayOneShot(_spawnItemsSound);
     }
     
-    public void PlayNoMatchSound()
+    public void PlayNoMatchSound(float delay)
     {
-        _audioSource.PlayOneShot(_noMatchSound);
+        _audioSource.clip = _noMatchSound;
+        _audioSource.PlayDelayed(delay);
     }
     
     public void PlayMatchSound(float delay)

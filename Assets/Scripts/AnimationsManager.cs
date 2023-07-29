@@ -7,7 +7,7 @@ using UnityEngine.Events;
 public class AnimationsManager : MonoBehaviour
 {
     [SerializeField]
-    private UnityEvent _noMatchEvent;
+    private UnityEvent<float> _noMatchEvent;
     [SerializeField]
     private UnityEvent<float> _matchEvent;
     [SerializeField]
@@ -28,18 +28,11 @@ public class AnimationsManager : MonoBehaviour
     public void ShowNoMatchAnimation(ItemView currentItem, ItemView targetItem,
         TweenCallback onAnimationCompleted)
     {
-        var sequence = DOTween.Sequence();
-        var path = new Vector3[2];
-        path[0] = targetItem.transform.position;
-        path[1] = currentItem.transform.position;
-        sequence.Join(currentItem.transform.DOPath(path, _movementDuration));
-        
-        path[0] = currentItem.transform.position;
-        path[1] = targetItem.transform.position;
-        sequence.Join(targetItem.transform.DOPath(path, _movementDuration));
-        
-        sequence.OnComplete(onAnimationCompleted);
-        _noMatchEvent?.Invoke();
+        var swapSequence = GetSwapSequence(currentItem, targetItem);
+        swapSequence.SetLoops(2, LoopType.Yoyo);
+
+        swapSequence.OnComplete(onAnimationCompleted);
+        _noMatchEvent?.Invoke(_movementDuration);
     }
 
     public void ShowMatchAnimation(ItemView currentItem, ItemView targetItem, List<Match> matches,
