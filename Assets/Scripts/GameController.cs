@@ -28,10 +28,10 @@ public class GameController : MonoBehaviour
         var itemViews = _itemsController.GetItems();
         _movementController.Initialize(_matchController, _mapIndexProvider, _animationsManager, itemViews);
         
-        _movementController.OnMatchesNotFound += OnMatchesNotFound;
+        _movementController.ItemsDropped += OnItemsDropped;
     }
 
-    private void OnMatchesNotFound()
+    private void OnItemsDropped()
     {
         _itemsController.RemoveMatchedItems();
         _itemsController.SpawnNewItems();
@@ -39,6 +39,6 @@ public class GameController : MonoBehaviour
     
     private void OnDestroy()
     {
-        _movementController.OnMatchesNotFound -= OnMatchesNotFound;
+        _movementController.ItemsDropped -= OnItemsDropped;
     }
 }

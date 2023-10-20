@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 { 
-    public event Action OnMatchesNotFound;
+    public event Action ItemsDropped;
     
     private MatchController _matchController;
     private MapIndexProvider _mapIndexProvider;
@@ -125,19 +125,12 @@ public class MovementController : MonoBehaviour
         _dropController.CalculateHolesInColumns();
         var itemsToDrop = _dropController.GetItemsToDrop();
         
-        if (itemsToDrop.Count == 0)
-        {
-            TryFindMatchesAfterMatch();    
-        }
-        else
-        {
-            DropItems(itemsToDrop);   
-        }
+        DropItems(itemsToDrop);
     }
 
     private void DropItems(List<DropItem> dropItems)
     {
-        _animationsManager.ShowDropItemsAnimation(dropItems, _items, TryFindMatchesAfterMatch);
+        _animationsManager.ShowDropItemsAnimation(dropItems, _items, OnItemsDropped);
 
         for (var i = dropItems.Count - 1; i >= 0; i--)
         {
@@ -145,8 +138,15 @@ public class MovementController : MonoBehaviour
             SwapPlaces(dropItem.TargetCoordinates, dropItem.CurrentCoordinates);
         }
     }
+    
+    private void OnItemsDropped()
+    {
+        ItemsDropped?.Invoke();
 
-    private void TryFindMatchesAfterMatch()
+        TryFindNewMatches();
+    }
+
+    private void TryFindNewMatches()
     {
         var allPossibleMatches = _matchController.GetAllPossibleMatches();
         
@@ -157,7 +157,7 @@ public class MovementController : MonoBehaviour
         }
         else
         {
-            OnMatchesNotFound?.Invoke();
+            ItemsDropped?.Invoke();
             OnAnimationCompleted();
         }
     }
